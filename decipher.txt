@@ -1,0 +1,14 @@
+Events from all three sections share the same meaning for the first 8 fields.
+
+Field 1 = The date that the event starts in the format YYYYMMDD (e.g. 20140101)
+Field 2 = The hour of the day that the event starts in the format HHMM or 0 (e.g. 1100)
+Field 3 = The date that the event ends in the format YYYYMMDD (e.g. 20300101)
+Field 4 = The hour of the day that the event ends in the format HHMM or 0 (e.g. 1100)
+Field 5 = The hour of the day that the event starts (for each day) in the format HHMM (e.g. 1900)
+Field 6 = The hour of the day that the event end (for each day) in the format HHMM (e.g. 2000)
+Field 7 = The minimum version number required for the event. Replace dots with zeros. (e.g. 30101 for version 3.1.1)
+Field 8 = The maximum version number required for the event. Replace dots with zeros. Use 99999 for no maximum version.
+Field 9 = Days of the week or month that the event is available on. The first 7 bits are for days of the week: if the bit is set then the event is available on that day starting with Sunday as the least significant bit. The day of the month the event is available on can be found by shifting the field 10 bits to the right. If the value of this field is 0 then the event is available on all the days of the week/month.
+Fields 2 and 4 are the times for the start and end times of the whole event, and Fields 5 and 6 are the start and end times for each day, for example, if a level was only available between 7pm and 8pm. If Field 5 is 0 and Field 6 is 2400 then the event is available for the whole day.
+
+
