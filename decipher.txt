@@ -1,3 +1,4 @@
+https://old.reddit.com/r/battlecats/comments/3tf03s/how_to_retrieve_and_decipher_battle_cats_event/
 Events from all three sections share the same meaning for the first 8 fields.
 
 Field 1 = The date that the event starts in the format YYYYMMDD (e.g. 20140101)
@@ -11,4 +12,15 @@ Field 8 = The maximum version number required for the event. Replace dots with z
 Field 9 = Days of the week or month that the event is available on. The first 7 bits are for days of the week: if the bit is set then the event is available on that day starting with Sunday as the least significant bit. The day of the month the event is available on can be found by shifting the field 10 bits to the right. If the value of this field is 0 then the event is available on all the days of the week/month.
 Fields 2 and 4 are the times for the start and end times of the whole event, and Fields 5 and 6 are the start and end times for each day, for example, if a level was only available between 7pm and 8pm. If Field 5 is 0 and Field 6 is 2400 then the event is available for the whole day.
 
-
+Field 10 = Capsule type ID.
+Field 11 = Number of capsules in this event.
+Field 12 = Capsule event ID.
+Field 13 = Some sort of flags. If the 6th least significant bit is set, then the event is a guaranteed uber.
+Field 14 = The cost of one rare ticket
+Field 15 = The chance for this capsule to get a normal cat (out of 10000)
+Field 16 = The chance for this capsule to get a rare cat (out of 10000)
+Field 17 = The chance for this capsule to get a super-rare cat (out of 10000)
+Field 18 = The chance for this capsule to get a uber-rare cat (out of 10000)
+Field 19 = ???
+Field 20 = The flashing text shown on the capsule screen
+If there are more than one capsule in the event (Field 11 is greater than 1) then Fields 12-20 are repeated for each event i.e. the second event will be Fields 21-29.
