@@ -5,36 +5,57 @@ from pathlib import Path
 
 #testing
 data_test = pd.read_table(
-                          'events/20180626.tsv', #first event file
-                          on_bad_lines='skip', #skipping rows with more than 25 columns
+                          'events/20180707.tsv', #first event file
+                          on_bad_lines='warn', #skipping rows with more than 25 columns #changed to warn
                           header=None,
                           skiprows=1, #skipping the tsv [start] line
-                          skipfooter=1, #skipping the tsv [end] line
                           #skipfooter might be unnecessary when using dropna
-                          engine='python',
+                          engine='pyarrow', #engine is pyarrow because it has multithreading
                           parse_dates=[0,2],#read the start and end dates as dates
                           date_format="%Y%m%d", #date format
                           #renaming columns
                           names=['start date','start hour','end date','end hour','min version','max version',
                                  'ignore1','ignore2','gacha type','num gachas','gacha id', 'gacha price','ignore3',
                                  'ignore4','chance normal','ignore5','chance rare','ignore6','chance super','ignore7',
-                                 'chance uber','guarunteed event','chance legend','ignore8','gacha message'],
+                                 'chance uber','guaranteed event','chance legend','ignore8','gacha message'],
                           )
                           
 #dropping the rows with an empty gacha message
 data_test.dropna(subset=['gacha message'], inplace=True)
 
+#dropping the empty columns
+data_test.drop(columns=['ignore1','ignore2','ignore3','ignore4','ignore5','ignore6','ignore7','ignore8'], inplace=True)
+
+#dropping columns that won't be used
+data_test.drop(columns=['start hour','end hour','min version','max version',
+                        'num gachas','gacha price',
+                        'chance normal','chance rare','chance super',
+                        'chance uber','guaranteed event','chance legend'], inplace=True)
+
 print(data_test)
 
-
 #full data (not ready)
-'''
+#use concat(dfs) ignore index
 #trying to combine the event data files into one dataframe
-#ValueError: Indexes have overlapping values...
-data_full = pd.DataFrame().join([
-    #engine is pyarrow because it has multithreading, pyarrow doesn't support skipfooter
-    pd.read_table(file_names, on_bad_lines='skip', header=None, skiprows=1, engine='pyarrow').dropna(subset=[24])
-    for file_names in Path('events').iterdir()
-    ])
 
-print(data_full)'''
+data_full = pd.concat([
+    pd.read_table(
+                #keyword arguments copied from data_test
+                file_names, on_bad_lines='warn', header=None, skiprows=1, engine='pyarrow',
+                parse_dates=[0,2],date_format='%Y%m%d',
+                names=['start date','start hour','end date','end hour','min version','max version',
+                    'ignore1','ignore2','gacha type','num gachas','gacha id', 'gacha price','ignore3',
+                    'ignore4','chance normal','ignore5','chance rare','ignore6','chance super','ignore7',
+                    'chance uber','guaranteed event','chance legend','ignore8','gacha message'],
+                ).dropna(subset=['gacha message']
+                ).drop(columns=['ignore1','ignore2','ignore3','ignore4','ignore5','ignore6','ignore7','ignore8']
+                ).drop(columns=['start hour','end hour','min version','max version',
+                        'num gachas','gacha price',
+                        'chance normal','chance rare','chance super',
+                        'chance uber','guaranteed event','chance legend'])
+    for file_names in Path('events').iterdir()
+    ], ignore_index=True)
+
+print(data_full)
+
+data_full.sort_values(by='start date').to_csv('full.csv', index=False)
