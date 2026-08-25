@@ -5,7 +5,7 @@ from pathlib import Path
 
 #testing
 data_test = pd.read_table(
-                          'events/20180707.tsv', #first event file
+                          'events/20180707.tsv', #one of the event/ files
                           on_bad_lines='warn', #skipping rows with more than 25 columns #changed to warn
                           header=None,
                           skiprows=1, #skipping the tsv [start] line
