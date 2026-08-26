@@ -35,8 +35,8 @@ data_test.drop(columns=['start hour','end hour','min version','max version',
 print(data_test)
 
 #full data (not ready)
-#use concat(dfs) ignore index
 #trying to combine the event data files into one dataframe
+#only works for data before mid 2021, tsv format might've changed after that
 
 data_full = pd.concat([
     pd.read_table(
@@ -54,7 +54,7 @@ data_full = pd.concat([
                         'chance normal','chance rare','chance super',
                         'chance uber','guaranteed event','chance legend'])
     for file_names in Path('events').iterdir()
-    ], ignore_index=True)
+    ], ignore_index=True).drop_duplicates()
 
 print(data_full)
 
