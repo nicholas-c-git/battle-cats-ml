@@ -27,7 +27,7 @@ data_test = pd.read_table(
 def read25(line:list(str)):
     return line[:25]
 
-#full data (not fully ready)
+#full data
 #turns the event/ files into a list of DataFrames, then combines all DataFrames in the list
 data_full = pd.concat([
     pd.read_table(
