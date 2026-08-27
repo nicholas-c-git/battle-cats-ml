@@ -77,9 +77,9 @@ for index in range(len(data_important.index)):
         #fill in the series_id using the interpreter_table to match the 'gacha id' with the right 'series id'
         data_important.at[index,'series id'] = interpreter_table.at[gacha_id, 'seriesID']
 
-#converting the 'series id' column values back to int
-#we need to convert because having None values in the columns makes the int values turn into floats
-#data_important.convert_dtypes()
+#converting the 'start date' column values back to time format
+#it unconverted at somepoint earlier, the reason is still unknown
+data_important['start date'] = pd.to_datetime(data_important['start date'], format='%Y%m%d')
 
 #output the table into a file
 data_important.sort_values(by=['series id','start date']).to_csv('full.csv', index=False)
