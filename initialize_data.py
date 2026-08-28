@@ -82,4 +82,24 @@ for index in range(len(data_important.index)):
 data_important['start date'] = pd.to_datetime(data_important['start date'], format='%Y%m%d')
 
 #output the table into a file
-data_important.sort_values(by=['series id','start date']).to_csv('full.csv', index=False)
+data_important.sort_values(by=['series id','start date']).to_csv('series.csv', index=False)
+
+
+
+#additional things for later:
+#a couple of valentines banners got marked as gacha id 475, which corresponds to ultra souls
+
+#missing series ids: 11,12,17,21,25,29,36,45,46,55,58,59,60,62,69
+series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals', 4:'dragon emperors', 5:'red busters',
+                     6:'ultra souls', 7:'dark heroes', 8:'halloween', 9:'christmas', 10:"year's end", 13:'merc storia',
+                     14:'mola', 15:'shoumetsu toshi', 16:"new year's + LNY", 18:'almighties', 19:'uberfest',
+                     20:'summer', 22:'air busters', 23:'madoka magica', 24:'iron legion', 26:'spring', 27:'epicfest',
+                     28:'girls monsters', 30:'ultra selection + LNY', 31:'miracle selection + LNY', 32:'metal busters',
+                     33:'elemental pixies', 34:'fate', 35:'best of the best', 37:'evangelion', 38:'bikkuriman',
+                     39:'anniversary + LNY', 40:'street fighters', 41:'LNY + excellent selection', 42:'superfest',
+                     43:'hatsune miku', 44:'evangelion angels', 47:'seasonal', 48:'valentine', 49:'ranma', 50:'legendfest',
+                     51:'river city clash', 52:'white day', 53:'june bride', 54:'street fighter 2',
+                     56:'colossus slayers', 57:'river city clash 2', 59:'busters', 61:'90M DL',
+                     63:'rurouni kenshin', 64:'summer 2', 65:'summer 3', 66:'LNY + miracle/ultra selection',
+                     67:'LNY + miracle selection', 68: 'LNY + miracle/ultra selection 2', 70:'koneko',
+                     71:'special units?', 72:'baki', 73:'sonic', 74:'demon slayer'}
