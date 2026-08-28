@@ -50,7 +50,7 @@ data_full = pd.concat([
     ignore_index=True).dropna(subset=['gacha id']).reset_index().convert_dtypes()
 
 #uncomment the next line for data_full.csv
-#data_full.sort_values(by=['gacha id']).to_csv('data_full.csv', index=False)
+data_full.sort_values(by=['gacha id']).to_csv('data_full.csv', index=True)
 
 #simplify the table to just what we will use
 data_important = data_full[['start date', 'end date', 'gacha type', 'gacha id', 'gacha message']]
@@ -81,8 +81,10 @@ for index in range(len(data_important.index)):
 #it unconverted at somepoint earlier, the reason is still unknown
 data_important['start date'] = pd.to_datetime(data_important['start date'], format='%Y%m%d')
 
-#output the table into a file
-data_important.sort_values(by=['series id','start date']).to_csv('series.csv', index=False)
+#output the table into a csv file
+#drop 'index' column because reset_index makes the old index into a column
+data_important = data_important.sort_values(by=['series id','start date']).reset_index().drop(columns='index')
+data_important.to_csv('series.csv', index=True)
 
 
 
