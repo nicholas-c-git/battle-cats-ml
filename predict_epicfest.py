@@ -7,12 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 
 #basic classification models
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-data_important = pd.read_csv('series.csv')
+data_important = pd.read_csv('series.csv').sort_values('start date')
 
 #date columns as a datetime
 start_date = pd.to_datetime(data_important['start date'])
@@ -38,6 +38,20 @@ data_compiled = pd.concat(
      axis=1) #join columns
 
 #rename columns
-data_compiled.columns =['start month', 'start day', 'duration', 'time since Jan 1', 'is Epicfest']
+data_compiled.columns = ['start month', 'start day', 'duration', 'time since Jan 1', 'is Epicfest']
+data_compiled.convert_dtypes()
 
-data_compiled.to_csv('training_data.csv')
+#uncomment for csv
+#data_compiled.to_csv('training_data.csv')
+
+X = data_compiled[['start month','start day']]
+y = np.ravel(data_compiled[['is Epicfest']])
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1/6, random_state=568)
+
+LRModel = LogisticRegression()
+LRModel.fit(X_train,y_train)
+
+print("Logistic Regression training score: " + str(round(LRModel.score(X_train, y_train), 4)))
+print("Logistic Regression testing score: " + str(round(LRModel.score(X_test, y_test), 4)))
+print("Logistic Regression full dataset score: " + str(round(LRModel.score(X, y), 4)))
