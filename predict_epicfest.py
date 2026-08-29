@@ -14,6 +14,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 data_important = pd.read_csv('series.csv')
 
+#date columns as a datetime
+start_date = pd.to_datetime(data_important['start date'])
+end_date = pd.to_datetime(data_important['end date'])
+
 #initialize a one hot encoder in pandas DataFrame format
 one_hot = OneHotEncoder(sparse_output=False).set_output(transform='pandas')
 
@@ -22,16 +26,18 @@ one_hot = OneHotEncoder(sparse_output=False).set_output(transform='pandas')
 data_encoded = one_hot.fit_transform(data_important[['series id']]).convert_dtypes()
 
 #series id 27 is epicfest
-data_27 = data_encoded[['series id_27']]
+data_27 = data_encoded['series id_27']
 
 #making a dataframe of the features to be used
 data_compiled = pd.concat(
-    [data_important[['start date', 'end date']],
-     data_27],
-    axis=1) #columns
+    [start_date.dt.month,
+     start_date.dt.day,
+     end_date - start_date, #duration in days
+     start_date - pd.to_datetime(start_date.dt.year.astype(str) + "-01-01"), #time since start of year
+     data_27], #boolean representing whether event was epicfest
+     axis=1) #join columns
 
-print(data_compiled)
-#probably going to transform the 'start date' (YYYY-MM-DD) into just month and day or
-#time since start of year.
-#also want to turn 'end date' into a duration instead (start date - end date)
+#rename columns
+data_compiled.columns =['start month', 'start day', 'duration', 'time since Jan 1', 'is Epicfest']
 
+data_compiled.to_csv('training_data.csv')
