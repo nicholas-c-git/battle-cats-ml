@@ -26,8 +26,25 @@ one_hot = OneHotEncoder(sparse_output=False).set_output(transform='pandas')
 data_encoded = one_hot.fit_transform(data_important[['series id']]).convert_dtypes()
 
 #series id 27 is epicfest
-banner_id = 27
-id_data = data_encoded['series id_' + str(banner_id)]
+BANNER_ID = 27
+id_data = data_encoded['series id_' + str(BANNER_ID)]
+
+#dict for ID to standardized name conversion
+series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals', 4:'dragon emperors', 5:'red busters',
+                     6:'ultra souls', 7:'dark heroes', 8:'halloween', 9:'christmas', 10:"year's end", 13:'merc storia',
+                     14:'mola', 15:'shoumetsu toshi', 16:"new year's + LNY", 18:'almighties', 19:'uberfest',
+                     20:'summer', 22:'air busters', 23:'madoka magica', 24:'iron legion', 26:'spring', 27:'epicfest',
+                     28:'girls monsters', 30:'ultra selection + LNY', 31:'miracle selection + LNY', 32:'metal busters',
+                     33:'elemental pixies', 34:'fate', 35:'best of the best', 37:'evangelion', 38:'bikkuriman',
+                     39:'anniversary + LNY', 40:'street fighters', 41:'LNY + excellent selection', 42:'superfest',
+                     43:'hatsune miku', 44:'evangelion angels', 47:'seasonal', 48:'valentine', 49:'ranma', 50:'legendfest',
+                     51:'river city clash', 52:'white day', 53:'june bride', 54:'street fighter 2',
+                     56:'colossus slayers', 57:'river city clash 2', 59:'busters', 61:'90M DL',
+                     63:'rurouni kenshin', 64:'summer 2', 65:'summer 3', 66:'LNY + miracle/ultra selection',
+                     67:'LNY + miracle selection', 68: 'LNY + miracle/ultra selection 2', 70:'koneko',
+                     71:'special units?', 72:'baki', 73:'sonic', 74:'demon slayer'}
+
+print("initializing for banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
 
 #making a dataframe of the features to be used
 data_compiled = pd.concat(
