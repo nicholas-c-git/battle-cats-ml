@@ -104,12 +104,33 @@ print()
 #models all done
 #predicting the next 60 days and taking the most likely start date(s) (in progress)
 
-#make a DataFrame with 60 indices, set the value to today's date as a datetime
-today = pd.DataFrame(columns=['dates'],index=range(60))
-today['dates'] = date.today()
-today = pd.to_datetime(today['dates'])
+#the number of days into the future to examine
+#   should also work if the range crosses into the next year
+PREDICTION_RANGE = 60
 
-#for i 1-59 (remaining index numbers for the dataframe to have indices 0-59)
-#   add i day(s) to index i
+#make new a DataFrame that will contain the date (index) days from today
+from_today = pd.DataFrame(columns=['dates'])
 
-print(today.head())
+#for i in 0-59
+for i in range(PREDICTION_RANGE):
+    #set index i to i days from today
+    from_today.at[ i , 'dates' ] = pd.to_datetime(date.today()) + pd.to_timedelta(f"{i} days")
+from_today = pd.to_datetime(from_today['dates'])
+
+#dataframe of the next 60 days' 'start month','start day', 'days since Jan 1'
+Future_X = pd.concat([
+                        from_today.dt.month,
+                        from_today.dt.day,
+                        from_today - pd.to_datetime(from_today.dt.year.astype(str)+'-01-01'),
+                    ], axis=1)
+
+#rename columns
+Future_X.columns = ['start month','start day', 'days since Jan 1']
+
+#change 'days since Jan 1' from 'i days' into just the int
+Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
+
+#predictions = LRModel.predict(Future_X)
+
+print(Future_X.head())
+#print(predictions)
