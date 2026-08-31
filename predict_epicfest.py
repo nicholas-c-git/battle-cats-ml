@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from datetime import date
+
 from sklearn.model_selection import train_test_split
 
 #encoding series id to either 1 for the desired event, or 0
@@ -12,6 +14,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
+#preparing the data
+
+#you can make series.csv using initialize_data.py
 data_important = pd.read_csv('series.csv').sort_values('start date')
 
 #date columns as a datetime
@@ -26,6 +31,7 @@ one_hot = OneHotEncoder(sparse_output=False).set_output(transform='pandas')
 data_encoded = one_hot.fit_transform(data_important[['series id']]).convert_dtypes()
 
 #series id 27 is epicfest
+#works for other ids (only the ids in the dict below)
 BANNER_ID = 27
 id_data = data_encoded['series id_' + str(BANNER_ID)]
 
@@ -55,18 +61,22 @@ data_compiled = pd.concat(
      id_data], #boolean representing whether event was the right event
      axis=1) #join columns
 
-#rename columns
+#rename columns and convert seconds to days
 data_compiled.columns = ['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']
 data_compiled['duration'] = data_compiled['duration'].dt.days
 data_compiled['days since Jan 1'] = data_compiled['days since Jan 1'].dt.days
 
-#data_compiled.convert_dtypes()
-
 #uncomment for csv
-data_compiled.to_csv('training_data.csv')
+#data_compiled.to_csv('training_data.csv')
+
+#data is pretty much fully prepared now
+#moving onto the machine learning stuff
 
 #X and y are the input and output features
-X = data_compiled[['start month','start day', 'duration', 'days since Jan 1']]
+#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner'
+#   but 'is Correct Banner' should be an output feature (y),
+#   and 'duration' isn't really a good input feature
+X = data_compiled[['start month','start day', 'days since Jan 1']]
 y = np.ravel(data_compiled[['is Correct Banner']])
 
 #make separate datasets, one for model training, one for model testing/scoring
@@ -86,3 +96,20 @@ print()
 #model weights
 print("Logistic Regression model weights:")
 print('[Intercept]' , X.columns.to_list(), "\n" , LRModel.intercept_ , LRModel.coef_)
+print()
+
+#planning to implement more models, and also want to use KFold cross validation
+#   will probably start after the section below
+
+#models all done
+#predicting the next 60 days and taking the most likely start date(s) (in progress)
+
+#make a DataFrame with 60 indices, set the value to today's date as a datetime
+today = pd.DataFrame(columns=['dates'],index=range(60))
+today['dates'] = date.today()
+today = pd.to_datetime(today['dates'])
+
+#for i 1-59 (remaining index numbers for the dataframe to have indices 0-59)
+#   add i day(s) to index i
+
+print(today.head())
