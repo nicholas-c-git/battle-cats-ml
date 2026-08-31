@@ -32,7 +32,7 @@ data_encoded = one_hot.fit_transform(data_important[['series id']]).convert_dtyp
 
 #series id 27 is epicfest
 #works for other ids (only the ids in the dict below)
-BANNER_ID = 27
+BANNER_ID = 27 #input("series id to use for trainging and predictions (enter 27 for epicfest) : ")
 id_data = data_encoded['series id_' + str(BANNER_ID)]
 
 #dict for ID to standardized name conversion
@@ -106,7 +106,7 @@ print()
 
 #the number of days into the future to examine
 #   should also work if the range crosses into the next year
-PREDICTION_RANGE = 60
+PREDICTION_RANGE = 60 #input("how many days to look ahead for prediction: ")
 
 #make new a DataFrame that will contain the date (index) days from today
 from_today = pd.DataFrame(columns=['dates'])
@@ -130,7 +130,15 @@ Future_X.columns = ['start month','start day', 'days since Jan 1']
 #change 'days since Jan 1' from 'i days' into just the int
 Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
 
-#predictions = LRModel.predict(Future_X)
+predictions = LRModel.predict(Future_X)
 
+print(X_train.head())
 print(Future_X.head())
-#print(predictions)
+print(predictions)
+print(X_train.columns)
+print(Future_X.columns)
+
+#predict() predicts all 0s, possibly something wrong with how I implemented/fit the model
+#   I'm guessing that the model predicts 0 for everything
+#   maybe an error with reading training data?
+#   maybe not enough data?
