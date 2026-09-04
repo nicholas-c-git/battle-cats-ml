@@ -135,23 +135,27 @@ print("K-Neighbors doesn't use model weights")
 print()
 
 #figuring out matplotlib
+
+delete_quotations_to_see_plot='''
 #initializing a plot
 fig = plt.figure()
-plt.scatter(X_KN, y)
+plt.scatter(X_KN, y, color='black')
 
-#the input features are working right with the plot
-x_prob = np.linspace(X_KN.min(), X_KN.max(), 400)
+#the predictions of each day of the year
+x_prob = pd.DataFrame({'days since Jan 1':range(400)})
+x_prob['days since Jan 1'] = np.linspace(X_KN.min(), X_KN.max(), 400)
 y_prob = KNModel.predict_proba(x_prob)[:,1]
 
 plt.plot(x_prob, y_prob) #the predictions for each day of the year
-plt.xlabel("start day")
-plt.ylabel("epicfest?")
+plt.xlabel("days since Jan 1")
+plt.ylabel("epicfest likelihood")
 plt.show()
+'''
 
 #planning to implement more models, and also want to use KFold cross validation
 #   will probably start after the section below
 
-#models all done
+#the models are all above this comment
 #predicting the next 60 days and taking the most likely start date(s) (in progress)
 
 #the number of days into the future to examine
@@ -167,7 +171,7 @@ for i in range(PREDICTION_RANGE):
     from_today.at[ i , 'dates' ] = pd.to_datetime(date.today()) + pd.to_timedelta(f"{i} days")
 from_today = pd.to_datetime(from_today['dates'])
 
-#dataframe of the next 60 days' 'start month','start day', 'days since Jan 1'
+#dataframe of the next 60 days' 'days since Jan 1' (need to change depending on model's input features)
 Future_X = pd.concat([
                         from_today - pd.to_datetime(from_today.dt.year.astype(str)+'-01-01'),
                     ], axis=1)
@@ -179,3 +183,5 @@ Future_X.columns = ['days since Jan 1']
 Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
 
 predictions = KNModel.predict(Future_X)
+
+print(predictions)
