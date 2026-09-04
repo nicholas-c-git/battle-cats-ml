@@ -50,7 +50,7 @@ data_full = pd.concat([
     ignore_index=True).dropna(subset=['gacha id']).reset_index().convert_dtypes()
 
 #uncomment the next line for data_full.csv
-data_full.sort_values(by=['gacha id']).to_csv('data_full.csv', index=True)
+#data_full.sort_values(by=['gacha id']).to_csv('data_full.csv', index=True)
 
 #simplify the table to just what we will use
 data_important = data_full[['start date', 'end date', 'gacha type', 'gacha id', 'gacha message']]
@@ -84,11 +84,11 @@ data_important['start date'] = pd.to_datetime(data_important['start date'], form
 #output the table into a csv file
 #drop 'index' column because reset_index makes the old index into a column
 data_important = data_important.sort_values(by=['series id','start date']).reset_index().drop(columns='index')
-data_important.to_csv('series.csv', index=True)
+data_important.to_csv('series_id.csv', index=True)
 
 
 
-#additional things for later:
+#additional notes:
 #a couple of valentines banners got marked as gacha id 475, which corresponds to ultra souls
 
 #missing series ids: 11,12,17,21,25,29,36,45,46,55,58,59,60,62,69

@@ -186,6 +186,7 @@ Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
 #add a column 'prediction' which contains the probability that the banner appears for each day
 Future_X['prediction'] = KNModel.predict_proba(Future_X)[:,1]
 
+print("likely appearances:")
 #go through the predictions
 for i, prediction in enumerate(Future_X['prediction']):
     #print each day with a probability over 0.5
