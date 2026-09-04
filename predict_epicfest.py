@@ -9,35 +9,19 @@ from datetime import date
 
 from sklearn.model_selection import train_test_split
 
-#encoding series id to either 1 for the desired event, or 0
-from sklearn.preprocessing import OneHotEncoder
-
 #basic classification models
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-#preparing the data
-
-#you can make series.csv using initialize_data.py
-data_important = pd.read_csv('series.csv').sort_values('start date')
-
-#date columns as a datetime
-start_date = pd.to_datetime(data_important['start date'])
-end_date = pd.to_datetime(data_important['end date'])
-
-#initialize a one hot encoder in pandas DataFrame format
-one_hot = OneHotEncoder(sparse_output=False).set_output(transform='pandas')
-
-#make a DataFrame of the series id column but encoded
-#convert_dtypes because the 1s and 0s were 1.0 and 0.0
-data_encoded = one_hot.fit_transform(data_important[['series id']]).convert_dtypes()
+#you can make training_data.csv using prepare_training_data.py
+prepared_data = pd.read_csv('training_data.csv')
 
 #series id 27 is epicfest
 #works for other ids (only the ids in the dict below)
 BANNER_ID = 27 #input("series id to use for trainging and predictions (enter 27 for epicfest) : ")
-id_data = data_encoded['series id_' + str(BANNER_ID)]
+id_data = pd.DataFrame({'is Correct Banner':prepared_data['series id_' + str(BANNER_ID)]})
 
 #dict for ID to standardized name conversion
 series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals', 4:'dragon emperors', 5:'red busters',
@@ -54,34 +38,16 @@ series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals',
                      67:'LNY + miracle selection', 68: 'LNY + miracle/ultra selection 2', 70:'koneko',
                      71:'special units?', 72:'baki', 73:'sonic', 74:'demon slayer'}
 
-print("initializing for banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
+necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1']], id_data], axis=1)
 
-#making a dataframe of the features to be used
-data_compiled = pd.concat(
-    [start_date.dt.month,
-     start_date.dt.day,
-     end_date - start_date, #duration in days
-     start_date - pd.to_datetime(start_date.dt.year.astype(str) + "-01-01"), #days since start of year
-     id_data], #boolean representing whether event was the right event
-     axis=1) #join columns
-
-#rename columns and convert seconds to days
-data_compiled.columns = ['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']
-data_compiled['duration'] = data_compiled['duration'].dt.days
-data_compiled['days since Jan 1'] = data_compiled['days since Jan 1'].dt.days
-
-#uncomment for csv
-#data_compiled.to_csv('training_data.csv')
-
-#data is pretty much fully prepared now
-#moving onto the machine learning stuff
+print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
 
 #X and y are the input and output features
 #X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner'
 #   but 'is Correct Banner' should be an output feature (y),
 #   and 'duration' isn't really a good input feature
-X = data_compiled[['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']]
-y = np.ravel(data_compiled[['is Correct Banner']])
+X = necessary_data[['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']]
+y = np.ravel(necessary_data[['is Correct Banner']])
 
 #making X and y (input and output features) for each model
 X_LR = X[['start month', 'start day', 'days since Jan 1']]
