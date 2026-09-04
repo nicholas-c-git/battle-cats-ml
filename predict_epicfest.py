@@ -167,21 +167,27 @@ from_today = pd.DataFrame(columns=['dates'])
 
 #for i in 0-59
 for i in range(PREDICTION_RANGE):
-    #set index i to i days from today
+    #set index i of from_today to i days from today
     from_today.at[ i , 'dates' ] = pd.to_datetime(date.today()) + pd.to_timedelta(f"{i} days")
+#turn it into a datetime so the format doesn't also include seconds
 from_today = pd.to_datetime(from_today['dates'])
 
-#dataframe of the next 60 days' 'days since Jan 1' (need to change depending on model's input features)
+#dataframe of the next 60 days' 'days since Jan 1' (may need to change depending on model's input features)
 Future_X = pd.concat([
                         from_today - pd.to_datetime(from_today.dt.year.astype(str)+'-01-01'),
                     ], axis=1)
 
-#rename columns
-Future_X.columns = ['days since Jan 1']
+#rename columns using the model's input feature's column names
+Future_X.columns = KNModel.feature_names_in_
 
 #change 'days since Jan 1' from 'i days' into just the int
 Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
 
-predictions = KNModel.predict(Future_X)
+#add a column 'prediction' which contains the probability that the banner appears for each day
+Future_X['prediction'] = KNModel.predict_proba(Future_X)[:,1]
 
-print(predictions)
+#go through the predictions
+for i, prediction in enumerate(Future_X['prediction']):
+    #print each day with a probability over 0.5
+    if Future_X.at[i, 'prediction'] > 0.5:
+        print(f"{round(prediction,4)} probability of {series_id_to_name.get(BANNER_ID)} on {from_today.get(i)}")
