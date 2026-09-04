@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+#used for testing
+import matplotlib.pyplot as plt
+
+#needed for finding today's date, used when predicting
 from datetime import date
 
 from sklearn.model_selection import train_test_split
@@ -76,27 +80,73 @@ data_compiled['days since Jan 1'] = data_compiled['days since Jan 1'].dt.days
 #X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner'
 #   but 'is Correct Banner' should be an output feature (y),
 #   and 'duration' isn't really a good input feature
-X = data_compiled[['start month','start day', 'days since Jan 1']]
+X = data_compiled[['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']]
 y = np.ravel(data_compiled[['is Correct Banner']])
 
+#making X and y (input and output features) for each model
+X_LR = X[['start month', 'start day', 'days since Jan 1']]
+y_LR = y
+
 #make separate datasets, one for model training, one for model testing/scoring
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1/6, random_state=568)
+X_train_LR, X_test_LR, y_train_LR, y_test_LR = train_test_split(X_LR, y_LR, test_size=1/6, random_state=568)
 
 #initializing a model and fitting it to training data
 LRModel = LogisticRegression()
-LRModel.fit(X_train,y_train)
+LRModel.fit(X_train_LR,y_train_LR)
 
 #scoring the model performance on the datasets
 print()
-print("Logistic Regression training score:" , round(LRModel.score(X_train, y_train), 4))
-print("Logistic Regression testing score:" , round(LRModel.score(X_test, y_test), 4))
-print("Logistic Regression full dataset score:" , round(LRModel.score(X, y), 4))
+print("Logistic Regression training score:" , round(LRModel.score(X_train_LR, y_train_LR), 4))
+print("Logistic Regression testing score:" , round(LRModel.score(X_test_LR, y_test_LR), 4))
+print("Logistic Regression full dataset score:" , round(LRModel.score(X_LR, y_LR), 4))
 print()
 
 #model weights
 print("Logistic Regression model weights:")
 print('[Intercept]' , X.columns.to_list(), "\n" , LRModel.intercept_ , LRModel.coef_)
 print()
+
+#important note about linear regression
+#predict() predicts all 0s, possibly something wrong with how I implemented/fit the model
+#   I'm guessing that the model predicts 0 for everything
+#   maybe an error with reading training data?
+#   maybe not enough data?
+
+#notes from few days later:
+#   after a couple days of thinking, I'm pretty sure that it's the bad implementation of input features for
+#   this kind of model. Log Regression finds linear correlations, but the correlation here might not be linear
+
+#KNeighbors model now
+X_KN = X[['days since Jan 1']]
+y_KN = y
+
+X_train_KN, X_test_KN, y_train_KN, y_test_KN = train_test_split(X_KN, y_KN, test_size=1/6, random_state=568)
+
+KNModel = KNeighborsClassifier(n_neighbors=5)
+KNModel.fit(X_train_KN,y_train_KN)
+
+print()
+print("K-Neighbors training score:" , round(KNModel.score(X_train_KN, y_train_KN), 4))
+print("K-Neighbors testing score:" , round(KNModel.score(X_test_KN, y_test_KN), 4))
+print("K-Neighbors full dataset score:" , round(KNModel.score(X_KN, y_KN), 4))
+print()
+
+print("K-Neighbors doesn't use model weights")
+print()
+
+#figuring out matplotlib
+#initializing a plot
+fig = plt.figure()
+plt.scatter(X_KN, y)
+
+#the input features are working right with the plot
+x_prob = np.linspace(X_KN.min(), X_KN.max(), 400)
+y_prob = KNModel.predict_proba(x_prob)[:,1]
+
+plt.plot(x_prob, y_prob) #the predictions for each day of the year
+plt.xlabel("start day")
+plt.ylabel("epicfest?")
+plt.show()
 
 #planning to implement more models, and also want to use KFold cross validation
 #   will probably start after the section below
@@ -119,26 +169,13 @@ from_today = pd.to_datetime(from_today['dates'])
 
 #dataframe of the next 60 days' 'start month','start day', 'days since Jan 1'
 Future_X = pd.concat([
-                        from_today.dt.month,
-                        from_today.dt.day,
                         from_today - pd.to_datetime(from_today.dt.year.astype(str)+'-01-01'),
                     ], axis=1)
 
 #rename columns
-Future_X.columns = ['start month','start day', 'days since Jan 1']
+Future_X.columns = ['days since Jan 1']
 
 #change 'days since Jan 1' from 'i days' into just the int
 Future_X['days since Jan 1'] = Future_X['days since Jan 1'].dt.days
 
-predictions = LRModel.predict(Future_X)
-
-print(X_train.head())
-print(Future_X.head())
-print(predictions)
-print(X_train.columns)
-print(Future_X.columns)
-
-#predict() predicts all 0s, possibly something wrong with how I implemented/fit the model
-#   I'm guessing that the model predicts 0 for everything
-#   maybe an error with reading training data?
-#   maybe not enough data?
+predictions = KNModel.predict(Future_X)
