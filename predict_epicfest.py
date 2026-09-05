@@ -18,11 +18,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 #you can make training_data.csv using prepare_training_data.py
 prepared_data = pd.read_csv('training_data.csv')
 
-#series id 27 is epicfest
-#works for other ids (only the ids in the dict below)
-BANNER_ID = 27 #input("series id to use for trainging and predictions (enter 27 for epicfest) : ")
-id_data = pd.DataFrame({'is Correct Banner':prepared_data['series id_' + str(BANNER_ID)]})
-
 #dict for ID to standardized name conversion
 series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals', 4:'dragon emperors', 5:'red busters',
                      6:'ultra souls', 7:'dark heroes', 8:'halloween', 9:'christmas', 10:"year's end", 13:'merc storia',
@@ -37,6 +32,18 @@ series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals',
                      63:'rurouni kenshin', 64:'summer 2', 65:'summer 3', 66:'LNY + miracle/ultra selection',
                      67:'LNY + miracle selection', 68: 'LNY + miracle/ultra selection 2', 70:'koneko',
                      71:'special units?', 72:'baki', 73:'sonic', 74:'demon slayer'}
+
+#series id 27 is epicfest
+#works for other ids (only the ids in the dict below)
+BANNER_ID = input("series id to use for training and predictions: ")
+try:
+    BANNER_ID = int(BANNER_ID)
+    print("series id accepted\n")
+except ValueError:
+    BANNER_ID = 27
+    print("invalid series id, defaulting to 27\n")
+
+id_data = pd.DataFrame({'is Correct Banner':prepared_data['series id_' + str(BANNER_ID)]})
 
 necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1']], id_data], axis=1)
 
@@ -144,6 +151,7 @@ Future_X = pd.concat([
                     ], axis=1)
 
 #rename columns using the model's input feature's column names
+#the feature_names_in_ gives me a red line error warning, but running the script works fine
 Future_X.columns = KNModel.feature_names_in_
 
 #change 'days since Jan 1' from 'i days' into just the int
