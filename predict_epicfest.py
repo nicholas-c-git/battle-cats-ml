@@ -33,17 +33,34 @@ series_id_to_name = {0:'nekolugas', 1:'dynamites', 2:'vajiras', 3:'galaxy gals',
                      67:'LNY + miracle selection', 68: 'LNY + miracle/ultra selection 2', 70:'koneko',
                      71:'special units?', 72:'baki', 73:'sonic', 74:'demon slayer'}
 
+#make the dictionary with reversed key-value pairs
+name_to_series_id = {}
+for id, name in series_id_to_name.items():
+    name_to_series_id.setdefault(name, id)
+
 #series id 27 is epicfest
 #works for other ids (only the ids in the dict below)
+#also works for the exact names of the id
 BANNER_ID = input("series id to use for training and predictions: ")
+
+#we try to use the user input as the key for the series_id_to_name dict
+#the dict takes an int, so we try to convert the user input to an int
 try:
     BANNER_ID = int(BANNER_ID)
     print("series id accepted\n")
+#if the input wasn't an int, then we try to use it as the key to the name_to_series_id dict
 except ValueError:
-    BANNER_ID = 27
-    print("invalid series id, defaulting to 27\n")
+    if BANNER_ID in name_to_series_id.keys():
+        BANNER_ID = name_to_series_id.get(BANNER_ID)
+    #if the input wasn't and int, and wasn't a valid name, then just use our default banner
+    #our default is currently set to series id 27 (epicfest)
+    else:
+        BANNER_ID = 27
+        print("invalid series id, defaulting to 27\n")
 
-id_data = pd.DataFrame({'is Correct Banner':prepared_data['series id_' + str(BANNER_ID)]})
+#a dataframe with a column named 'is Correct Banner'
+#   the column's values are taken from prepared_data's column corresponding to our BANNER_ID
+id_data = pd.DataFrame({'is Correct Banner':prepared_data[f"series id_{BANNER_ID}"]})
 
 necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1']], id_data], axis=1)
 
