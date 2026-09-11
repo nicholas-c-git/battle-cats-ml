@@ -7,7 +7,11 @@ import matplotlib.pyplot as plt
 #needed for finding today's date, used when predicting
 from datetime import date
 
+#used for separating the testing set from the training set
 from sklearn.model_selection import train_test_split
+
+#distance based models like KNeighbors should have standardized input features
+from sklearn.preprocessing import StandardScaler
 
 #basic classification models
 from sklearn.linear_model import LogisticRegression
@@ -62,15 +66,15 @@ except ValueError:
 #   the column's values are taken from prepared_data's column corresponding to our BANNER_ID
 id_data = pd.DataFrame({'is Correct Banner':prepared_data[f"series id_{BANNER_ID}"]})
 
-necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1']], id_data], axis=1)
+necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance',]], id_data], axis=1)
 
 print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
 
 #X and y are the input and output features
-#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner'
+#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner'
 #   but 'is Correct Banner' should be an output feature (y),
 #   and 'duration' isn't really a good input feature
-X = necessary_data[['start month', 'start day', 'duration', 'days since Jan 1', 'is Correct Banner']]
+X = necessary_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner']]
 y = np.ravel(necessary_data[['is Correct Banner']])
 
 #making X and y (input and output features) for each model
