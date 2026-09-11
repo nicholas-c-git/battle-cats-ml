@@ -66,7 +66,10 @@ except ValueError:
 #   the column's values are taken from prepared_data's column corresponding to our BANNER_ID
 id_data = pd.DataFrame({'is Correct Banner':prepared_data[f"series id_{BANNER_ID}"]})
 
-necessary_data = pd.concat([prepared_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance',]], id_data], axis=1)
+#cleaning up the columns
+prepared_data = prepared_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance',]]
+
+data = pd.concat([prepared_data, id_data], axis=1)
 
 print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
 
@@ -74,8 +77,8 @@ print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_
 #X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner'
 #   but 'is Correct Banner' should be an output feature (y),
 #   and 'duration' isn't really a good input feature
-X = necessary_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner']]
-y = np.ravel(necessary_data[['is Correct Banner']])
+X = data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner']]
+y = np.ravel(data[['is Correct Banner']])
 
 #making X and y (input and output features) for each model
 X_LR = X[['start month', 'start day', 'days since Jan 1']]
