@@ -42,33 +42,61 @@ name_to_series_id = {}
 for id, name in series_id_to_name.items():
     name_to_series_id.setdefault(name, id)
 
+#take a user input for the series id focus on
+#   also some error/input handling
+
+#title
+print("\nNicholas's Battle Cats Banner Predictor!\n")
+
 #series id 27 is epicfest
 #works for other ids (only the ids in the dict below)
 #also works for the exact names of the id
-BANNER_ID = input("series id to use for training and predictions: ")
+BANNER_ID = input("What banner do you want to look for?\n"+
+                  "type 'help' for valid inputs, default value is 27 (epicfest)\n")
 
-#we try to use the user input as the key for the series_id_to_name dict
-#the dict takes an int, so we try to convert the user input to an int
+#only if the user input is 'help'
+while BANNER_ID == "help":
+
+    #making a really long string with all of the series ids and their corresponding banner names
+    key_value_pairs = ""
+
+    #format the keys and items into the string
+    for key,item in series_id_to_name.items():
+        key_value_pairs += f"ID {key} is for '{item}'\n"
+
+    #print the string and then ask for another input
+    #   does this loop again until the user input is something other than 'help'
+    print('\n' + key_value_pairs)
+    BANNER_ID = input("Type either the banner name or its ID number\n")
+
+#try to use the user input as the key for the series_id_to_name dict
+#importantly, the dict takes an int, so we try to convert the user input to an int
 try:
     BANNER_ID = int(BANNER_ID)
-    print("series id accepted\n")
-#if the input wasn't an int, then we try to use it as the key to the name_to_series_id dict
+    print("\nseries id accepted\n")
+
+#if the input wasn't an int, it will raise a ValueError
+#we check if it is a valid banner name/a key to the name_to_series_id dict (flipped version of series_id_to_name)
 except ValueError:
-    if BANNER_ID in name_to_series_id.keys():
-        BANNER_ID = name_to_series_id.get(BANNER_ID)
-    #if the input wasn't and int, and wasn't a valid name, then just use our default banner
+    if BANNER_ID.lower() in name_to_series_id.keys():
+        BANNER_ID = name_to_series_id.get(BANNER_ID.lower())
+        print("\nbanner id accepted\n")
+
+    #if all of that fails, just use our default banner
     #our default is currently set to series id 27 (epicfest)
     else:
         BANNER_ID = 27
         print("invalid series id, defaulting to 27\n")
 
-#a dataframe with a column named 'is Correct Banner'
+#a dataframe with 1 column named 'is Correct Banner'
 #   the column's values are taken from prepared_data's column corresponding to our BANNER_ID
-id_data = pd.DataFrame({'is Correct Banner':prepared_data[f"series id_{BANNER_ID}"]})
+id_data = pd.DataFrame({'is Correct Banner': prepared_data[f"series id_{BANNER_ID}"]})
 
-#cleaning up the columns
-prepared_data = prepared_data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance',]]
+#take out all the series id columns from prepared_data, since we have id_data for the series id that we care about
+num_series = len(series_id_to_name.keys()) #this assumes that series_id_to_name has keys for every series id
+prepared_data = prepared_data.iloc[:,:-num_series] #all indexes, and the columns except the series columns, which are all at the end
 
+#make a DataFrame with the training data columns
 data = pd.concat([prepared_data, id_data], axis=1)
 
 print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
