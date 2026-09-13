@@ -99,7 +99,7 @@ prepared_data = prepared_data.iloc[:,:-num_series] #all indexes, and the columns
 #make a DataFrame with the training data columns
 data = pd.concat([prepared_data, id_data], axis=1)
 
-print("initializing models on banner ID " + str(BANNER_ID) + ":" , series_id_to_name.get(BANNER_ID))
+print(f"initializing models on banner ID {str(BANNER_ID)}: {series_id_to_name.get(BANNER_ID)}\n")
 
 #X and y are the input and output features
 #X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner'
@@ -114,6 +114,31 @@ y_LR = y
 
 #make separate datasets, one for model training, one for model testing/scoring
 X_train_LR, X_test_LR, y_train_LR, y_test_LR = train_test_split(X_LR, y_LR, test_size=1/6, random_state=568)
+
+#model selection is done with user input
+
+#user inputs an int that corresponds to a model
+#   some models don't have model weights, like KNeighborsClassifier
+model_type = input("what model?\n0:LogisticRegression, 1:KNeighborsClassifier\n")
+model_weights = True
+
+#try to turn the user input into an int
+try:
+    model_type = int(model_type)
+except ValueError:
+    model_type = None
+
+#depending on what the user input was, we use different models
+#   models that have parameters will also prompt the user for parameters
+match model_type:
+    case 0:
+        model = LogisticRegression()
+    case 1:
+        model = KNeighborsClassifier(n_neighbors=input("n_neighbors="))
+        model_weights = False
+    case _:
+        print("invalid input")
+#not finished yet, the user input system works but isn't used yet
 
 #initializing a model and fitting it to training data
 LRModel = LogisticRegression()
