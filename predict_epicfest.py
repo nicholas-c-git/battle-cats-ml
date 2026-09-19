@@ -52,7 +52,7 @@ print("\nNicholas's Battle Cats Banner Predictor!\n")
 #works for other ids (only the ids in the dict below)
 #also works for the exact names of the id
 BANNER_ID = input("What banner do you want to look for?\n"+
-                  "type 'help' for valid inputs, default value is 27 (epicfest)\n")
+                  "type 'help' for a list of valid inputs, default value is 27 (epicfest)\n")
 
 #only if the user input is 'help'
 while BANNER_ID == "help":
@@ -99,13 +99,37 @@ prepared_data = prepared_data.iloc[:,:-num_series] #all indexes, and the columns
 #make a DataFrame with the training data columns
 data = pd.concat([prepared_data, id_data], axis=1)
 
-print(f"initializing models on banner ID {str(BANNER_ID)}: {series_id_to_name.get(BANNER_ID)}\n")
+print(f"now let's set up a model for banner ID {str(BANNER_ID)}: {series_id_to_name.get(BANNER_ID)}\n")
+
+#X and y are input and output features
+#All_X is a list of all the available input features
+#   The list excludes 'is Correct Banner'
+All_X = data.columns.to_list()[0:-1]
+
+#dict with keys: 0 to len(All_X)-1, values: All_X's values
+All_X_dict = dict([(x, All_X[x]) for x in range(len(All_X))])
+
+print("what input features to use?")
+X_keys = input("type 'help' for a list of valid input features\n")
+
+#BANNER_ID's help-loop, look there for more comments
+#   Almost the same but replace BANNER_ID with X_keys, and series_id_to_name to All_X_dict
+while X_keys == "help":
+
+    key_value_pairs = ""
+    for key,item in All_X_dict.items():
+        key_value_pairs += f"{key} for '{item}'\n"
+
+    #slightly different lines printed
+    print('\n' + key_value_pairs, "\nPlease only type the numbers that you want to use")
+    X_keys = input("(Example: '012' to use the first 3 input features)\n")
+
 
 #X and y are the input and output features
-#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner'
+#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance'
 #   but 'is Correct Banner' should be an output feature (y),
 #   and 'duration' isn't really a good input feature
-X = data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance', 'is Correct Banner']]
+X = data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance']]
 y = np.ravel(data[['is Correct Banner']])
 
 #making X and y (input and output features) for each model
@@ -120,6 +144,7 @@ X_train_LR, X_test_LR, y_train_LR, y_test_LR = train_test_split(X_LR, y_LR, test
 #user inputs an int that corresponds to a model
 #   some models don't have model weights, like KNeighborsClassifier
 model_type = input("what model?\n0:LogisticRegression, 1:KNeighborsClassifier\n")
+model = None
 model_weights = True
 
 #try to turn the user input into an int
