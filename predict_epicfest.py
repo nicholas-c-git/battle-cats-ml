@@ -119,10 +119,10 @@ def X_keys_help():
         result += f"{k} for '{i}'\n"
 
     print('\n' + result, "\nPlease only type the numbers that you want to use")
-    return input("(Example: '012' to use the first 3 input features)\n")
+    return input("Ex: '012' to use the first 3 input features\n(Note that duplicates will be removed automatically)\n")
 
 #handle the case that the input is invalid, or 'help'
-while False in [x in [str(y) for y in All_X_dict.keys()] for x in X_keys] or X_keys == '':
+while False in [x in {str(y) for y in All_X_dict.keys()} for x in X_keys] or X_keys == '':
 
     #just keep asking for inputs until it's valid
     if X_keys == 'help':
@@ -136,8 +136,9 @@ print("\ninput accepted\n")
 
 #X and y are the input and output features
 #   X turns X_keys into column names, then gets those columns from DataFrame data
+#       (if you care about how: it turns the characters into a set to remove duplicate digits, then gets the column name list using the digits as keys for All_X_dict)
 #   y is the output feature, which is always 'is Correct Banner'
-X = data[[All_X_dict.get(int(x)) for x in X_keys]]
+X = data[list({All_X_dict.get(int(x)) for x in X_keys})]
 y = np.ravel(data[['is Correct Banner']])
 
 #preparing the model
