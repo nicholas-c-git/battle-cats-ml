@@ -112,18 +112,25 @@ All_X_dict = dict([(x, All_X[x]) for x in range(len(All_X))])
 print("what input features to use?")
 X_keys = input("type 'help' for a list of valid input features\n")
 
-#BANNER_ID's help-loop, look there for more comments
-#   Almost the same but replace BANNER_ID with X_keys, and series_id_to_name to All_X_dict
-while X_keys == "help":
+#Very similar to BANNER_ID's 'help' handling, but now as a function for X_keys
+def X_keys_help():
 
-    key_value_pairs = ""
-    for key,item in All_X_dict.items():
-        key_value_pairs += f"{key} for '{item}'\n"
+    result = ""
+    for k,i in All_X_dict.items():
+        result += f"{k} for '{i}'\n"
 
-    #slightly different lines printed
-    print('\n' + key_value_pairs, "\nPlease only type the numbers that you want to use")
-    X_keys = input("(Example: '012' to use the first 3 input features)\n")
+    print('\n' + result, "\nPlease only type the numbers that you want to use")
+    return input("(Example: '012' to use the first 3 input features)\n")
 
+#handle the case that the input is invalid, or 'help'
+while False in [x in "1234567890" for x in X_keys] or X_keys == '':
+
+    if X_keys == 'help':
+        X_keys = X_keys_help()
+    else:
+        X_keys = input("\ninvalid input, try again\n")
+
+print("\ninput accepted\n")
 
 #X and y are the input and output features
 #X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance'
