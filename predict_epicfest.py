@@ -101,7 +101,6 @@ data = pd.concat([prepared_data, id_data], axis=1)
 
 print(f"now let's set up a model for banner ID {str(BANNER_ID)}: {series_id_to_name.get(BANNER_ID)}\n")
 
-#X and y are input and output features
 #All_X is a list of all the available input features
 #   The list excludes 'is Correct Banner'
 All_X = data.columns.to_list()[0:-1]
@@ -125,28 +124,21 @@ def X_keys_help():
 #handle the case that the input is invalid, or 'help'
 while False in [x in "1234567890" for x in X_keys] or X_keys == '':
 
+    #just keep asking for inputs until it's valid
     if X_keys == 'help':
         X_keys = X_keys_help()
+    
     else:
         X_keys = input("\ninvalid input, try again\n")
 
+#by this point, the input will be valid and non-empty
 print("\ninput accepted\n")
 
 #X and y are the input and output features
-#X can take the features: 'start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance'
-#   but 'is Correct Banner' should be an output feature (y),
-#   and 'duration' isn't really a good input feature
-X = data[['start month', 'start day', 'duration', 'days since Jan 1', 'days since last appearance']]
+#   X turns X_keys into column names, then gets those columns from DataFrame data
+#   y is the output feature, which is always 'is Correct Banner'
+X = data[[All_X_dict.get(int(x)) for x in X_keys]]
 y = np.ravel(data[['is Correct Banner']])
-
-#making X and y (input and output features) for each model
-X_LR = X[['start month', 'start day', 'days since Jan 1']]
-y_LR = y
-
-#make separate datasets, one for model training, one for model testing/scoring
-X_train_LR, X_test_LR, y_train_LR, y_test_LR = train_test_split(X_LR, y_LR, test_size=1/6, random_state=568)
-
-#model selection is done with user input
 
 #user inputs an int that corresponds to a model
 #   some models don't have model weights, like KNeighborsClassifier
@@ -171,6 +163,14 @@ match model_type:
     case _:
         print("invalid input")
 #not finished yet, the user input system works but isn't used yet
+
+
+#making X and y (input and output features) for each model
+X_LR = X[['start month', 'start day', 'days since Jan 1']]
+y_LR = y
+
+#make separate datasets, one for model training, one for model testing/scoring
+X_train_LR, X_test_LR, y_train_LR, y_test_LR = train_test_split(X_LR, y_LR, test_size=1/6, random_state=568)
 
 #initializing a model and fitting it to training data
 LRModel = LogisticRegression()
