@@ -122,7 +122,7 @@ def X_keys_help():
     return input("(Example: '012' to use the first 3 input features)\n")
 
 #handle the case that the input is invalid, or 'help'
-while False in [x in "1234567890" for x in X_keys] or X_keys == '':
+while False in [x in [str(y) for y in All_X_dict.keys()] for x in X_keys] or X_keys == '':
 
     #just keep asking for inputs until it's valid
     if X_keys == 'help':
@@ -140,28 +140,59 @@ print("\ninput accepted\n")
 X = data[[All_X_dict.get(int(x)) for x in X_keys]]
 y = np.ravel(data[['is Correct Banner']])
 
-#user inputs an int that corresponds to a model
-#   some models don't have model weights, like KNeighborsClassifier
-model_type = input("what model?\n0:LogisticRegression, 1:KNeighborsClassifier\n")
-model = None
+#preparing the model
+
+#some models don't have model weights, like KNeighborsClassifier
 model_weights = True
 
+#dict of implemented models
+model_dict = {
+    0:LogisticRegression(),
+    1:KNeighborsClassifier(),
+}
+print([str(x) for x in model_dict.values()])
+
+#user inputs an int that corresponds to a model
+print("what model?")
+model_key = input("type 'help' for available models\n")
+
+#handle invalid inputs as we did for input features
+def model_key_help():
+
+    result = ""
+    for k,i in model_dict.items():
+        result += f"{k} for '{i}'\n"
+
+    print('\n' + result)
+    return input("Please only type the numbers that you want to use\n")
+
+#handle the case that the input is invalid, or 'help'
+while not model_key in [str(y) for y in model_dict.keys()] or model_key == '':
+
+    #just keep asking for inputs until it's valid
+    if model_key == 'help':
+        model_key = model_key_help()
+    
+    else:
+        model_key = input("\ninvalid input, try again\n")
+
+model = None
 #try to turn the user input into an int
 try:
-    model_type = int(model_type)
+    model_key = int(model_key)
 except ValueError:
-    model_type = None
+    model_key = None
 
 #depending on what the user input was, we use different models
 #   models that have parameters will also prompt the user for parameters
-match model_type:
+match model_key:
     case 0:
         model = LogisticRegression()
     case 1:
         model = KNeighborsClassifier(n_neighbors=input("n_neighbors="))
         model_weights = False
     case _:
-        print("invalid input")
+        print("how did you get here?")
 #not finished yet, the user input system works but isn't used yet
 
 
