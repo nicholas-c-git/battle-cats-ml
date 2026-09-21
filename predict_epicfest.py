@@ -143,15 +143,15 @@ y = np.ravel(data[['is Correct Banner']])
 
 #preparing the model
 
-#some models don't have model weights, like KNeighborsClassifier
+#some models don't have model weights, like KNeighborsClassifier, so we'll set this as needed
 model_weights = True
 
 #dict of implemented models
+#the dict values are a list containing the model, list of (model parameter, type), model name, model_weights value
 model_dict = {
-    0:LogisticRegression(),
-    1:KNeighborsClassifier(),
+    0:[LogisticRegression, [], "Logistic Regression", True],
+    1:[KNeighborsClassifier, [('n_neighbors', int)], "K-Neighbors Classifier", False],
 }
-print([str(x) for x in model_dict.values()])
 
 #user inputs an int that corresponds to a model
 print("what model?")
@@ -177,26 +177,35 @@ while not model_key in [str(y) for y in model_dict.keys()] or model_key == '':
     else:
         model_key = input("\ninvalid input, try again\n")
 
-model = None
+#now, we should have a valid model_key that's just a string of a model_dict key
+#model_dict takes int keys
+
 #try to turn the user input into an int
 try:
     model_key = int(model_key)
 except ValueError:
+    print("something went wrong with casting model_key to int, somehow")
     model_key = None
 
-#depending on what the user input was, we use different models
-#   models that have parameters will also prompt the user for parameters
-match model_key:
-    case 0:
-        model = LogisticRegression()
-    case 1:
-        model = KNeighborsClassifier(n_neighbors=input("n_neighbors="))
-        model_weights = False
-    case _:
-        print("how did you get here?")
-#not finished yet, the user input system works but isn't used yet
+#ask if the user wants to set specific parameters
+param_bool = None
 
+#ask until input is 'y' or 'n'
+while not (param_bool == 'y' or param_bool == 'n'):
+    param_bool = input("\ndo you want to set your own parameters? 'y' or 'n'\n")
 
+#make it a boolean instead of string
+param_bool = True if param_bool == 'y' else (False if param_bool == 'n' else None)
+
+#if the model has parameters, get the user input for the parameters
+if param_bool:
+    pass
+
+#initialize the model
+model=model_dict.get(model_key)[0]()
+print(model)
+
+unneeded_for_now='''
 #making X and y (input and output features) for each model
 X_LR = X[['start month', 'start day', 'days since Jan 1']]
 y_LR = y
@@ -249,7 +258,7 @@ print("K-Neighbors doesn't use model weights")
 print()
 
 #figuring out matplotlib
-
+'''
 delete_quotations_to_see_plot='''
 #initializing a plot
 fig = plt.figure()
@@ -265,7 +274,7 @@ plt.xlabel("days since Jan 1")
 plt.ylabel("epicfest likelihood")
 plt.show()
 '''
-
+'''
 #planning to implement more models, and also want to use KFold cross validation
 #   will probably start after the section below
 
@@ -307,3 +316,4 @@ for i, prediction in enumerate(Future_X['prediction']):
     #print each day with a probability over 0.5
     if Future_X.at[i, 'prediction'] > 0.5:
         print(f"{round(prediction,4)} probability of {series_id_to_name.get(BANNER_ID)} on {from_today.get(i)}")
+'''
