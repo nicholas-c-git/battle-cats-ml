@@ -141,6 +141,9 @@ print("\ninput accepted\n")
 X = data[list({All_X_dict.get(int(x)) for x in X_keys})]
 y = np.ravel(data[['is Correct Banner']])
 
+#split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify=y, random_state=568)
+
 #preparing the model
 
 #some models don't have model weights, like KNeighborsClassifier, so we'll set this as needed
@@ -188,22 +191,43 @@ except ValueError:
     model_key = None
 
 #ask if the user wants to set specific parameters
-param_bool = None
+param_bool = 'I wonder if anyone sees this'
 
-#ask until input is 'y' or 'n'
-while not (param_bool == 'y' or param_bool == 'n'):
-    param_bool = input("\ndo you want to set your own parameters? 'y' or 'n'\n")
+#ask until input is valid
+while not (param_bool.lower() in ['y', 'yes', '1', 'n', 'no', '0']):
+    param_bool = input("\ndo you want to set your own parameters? 'y' or 'n'\n").lower()
 
 #make it a boolean instead of string
-param_bool = True if param_bool == 'y' else (False if param_bool == 'n' else None)
+param_bool = True if param_bool in ['y', 'yes', '1'] else (False if param_bool in ['n', 'no', '0'] else None)
+
+#the model's info
+model_list = model_dict.get(model_key)
+#the model itself
+model = model_list[0]
 
 #if the model has parameters, get the user input for the parameters
 if param_bool:
-    pass
+    #the string to eval(), will have all the parameters when we eval()
+    model_initializing = "model("
 
-#initialize the model
-model=model_dict.get(model_key)[0]()
-print(model)
+    #go through the parameters
+    for i in model_list[1]:
+        #making variables for the parameter name and type
+        param_name, param_type = model_list[1][0][0], model_list[1][0][1]
+        #get the user's input for this parameter
+        param_input = input(f"Enter an input for {param_name} (type: {param_type})\n")
+        model_initializing += f"{param_name}={param_type(param_input)}"
+
+    #finish the initialization function, then use eval() to call it
+    model_initializing += ")"
+    eval(model_initializing)
+
+#otherwise use default values
+else:
+    model()
+
+print(KNeighborsClassifier(n_neighbors=3).get_params())
+print(model.get_params()) #the initialization isn't working in the if-statement
 
 unneeded_for_now='''
 #making X and y (input and output features) for each model
